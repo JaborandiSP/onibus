@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ônibus Jaborandi ⇄ Colina ⇄ Barretos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    header {
+      padding: 16px;
+      text-align: center;
+      background: #111827;
+      border-bottom: 1px solid #1f2933;
+    }
+    h1 { font-size: 1.2rem; margin: 0; }.container { padding: 12px; }
+
+.card {
+  background: #111827;
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  padding: 6px;
+  text-align: center;
+  border-bottom: 1px solid #1f2933;
+}
+th { background: #1f2937; }
+
+.map {
+  position: relative;
+  height: 120px;
+  background: linear-gradient(90deg, #2563eb, #22c55e, #f59e0b);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.stop {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #111827;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border: 1px solid #e5e7eb;
+}
+
+.bus {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 1s linear, transform 0.5s linear;
+  font-size: 1.6rem;
+}
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 1s linear;
+  font-size: 1.6rem;
+}
+
+footer { text-align: center; font-size: 0.75rem; opacity: 0.6; padding: 8px; }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚌 Linha Jaborandi ⇄ Colina ⇄ Barretos</h1>
+    <div id="now"></div>
+  </header>  <div class="container"><div class="card">
+  <h3>Segunda a Sexta</h3>
+  <table id="weekTable"></table>
+</div>
+
+<div class="card">
+  <h3>Sábado e Domingo</h3>
+  <table id="weekendTable"></table>
+</div>
+
+<div class="card">
+  <h3>Onde está o ônibus agora (simulação ilustrada)</h3>
+  <div class="map" id="map">
+    <div class="stop" style="left:10%">Jaborandi</div>
+    <div class="stop" style="left:50%">Colina</div>
+    <div class="stop" style="left:90%">Barretos</div>
+    <div class="bus" id="bus">🚌</div>
+    <div class="bus" id="arrow" style="font-size:1.2rem; top:65%">➡️</div>
+  </div>
+  <p id="busStatus"></p>
+</div>
+
+  </div>  <footer>
+    Dados baseados em tabela impressa da viação. Representação ilustrativa.
+  </footer><script>
+// ===== DADOS DOS HORÁRIOS =====
+const week = [
+  {dir:"Jaborandi→Barretos", j:"04:45", c:"05:15", b:"05:45"},
+  {dir:"Jaborandi→Barretos", j:"12:00", c:"12:30", b:"13:00"},
+  {dir:"Jaborandi→Barretos", j:"16:00", c:"16:30", b:"17:00"},
+  {dir:"Jaborandi→Barretos", j:"18:00", c:"18:30", b:"19:00"},
+  {dir:"Jaborandi→Barretos", j:"20:30", c:"—", b:"21:15"},
+
+  {dir:"Barretos→Jaborandi", j:"03:50", c:"—", b:"04:35"},
+  {dir:"Barretos→Jaborandi", j:"07:30", c:"08:00", b:"08:30"},
+  {dir:"Barretos→Jaborandi", j:"15:00", c:"15:30", b:"16:00"},
+  {dir:"Barretos→Jaborandi", j:"17:00", c:"17:30", b:"18:00"},
+  {dir:"Barretos→Jaborandi", j:"19:30", c:"20:00", b:"20:30"},
+];
+
+const weekend = [
+  {dir:"Jaborandi→Barretos", j:"04:45", c:"05:15", b:"05:45"},
+  {dir:"Jaborandi→Barretos", j:"15:00", c:"15:30", b:"16:00"},
+  {dir:"Jaborandi→Barretos", j:"18:00", c:"18:30", b:"19:00"},
+  {dir:"Jaborandi→Barretos", j:"20:30", c:"—", b:"21:15"},
+
+  {dir:"Barretos→Jaborandi", j:"03:50", c:"—", b:"04:35"},
+  {dir:"Barretos→Jaborandi", j:"07:30", c:"08:00", b:"08:30"},
+  {dir:"Barretos→Jaborandi", j:"16:00", c:"16:30", b:"17:00"},
+  {dir:"Barretos→Jaborandi", j:"19:30", c:"20:00", b:"20:30"},
+];
+
+function buildTable(id, data) {
+  const table = document.getElementById(id);
+  let html = "<tr><th>Sentido</th><th>Jaborandi</th><th>Colina</th><th>Barretos</th></tr>";
+  data.forEach(r => {
+    html += `<tr><td>${r.dir}</td><td>${r.j}</td><td>${r.c}</td><td>${r.b}</td></tr>`;
+  });
+  table.innerHTML = html;
+}
+
+buildTable("weekTable", week);
+buildTable("weekendTable", weekend);
+
+// ===== RELÓGIO =====
+function updateClock() {
+  const now = new Date();
+  document.getElementById("now").innerText = "Agora: " + now.toLocaleString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ===== SIMULAÇÃO DA POSIÇÃO DO ÔNIBUS =====
+function timeToMinutes(t){
+  if(t==="—") return null;
+  const [h,m]=t.split(":").map(Number);
+  return h*60+m;
+}
+
+function updateBus(){
+  const arrow = document.getElementById("arrow");
+  const now = new Date();
+  const mins = now.getHours()*60 + now.getMinutes();
+  const bus = document.getElementById("bus");
+  const status = document.getElementById("busStatus");
+
+  let found = null;
+  // sentido Jaborandi -> Barretos
+  [...week, ...weekend].forEach(r=>{
+    const j=timeToMinutes(r.j);
+    const c=timeToMinutes(r.c);
+    const b=timeToMinutes(r.b);
+
+    if(j && c && mins>=j && mins<=c){
+      const p=(mins-j)/(c-j);
+      found={pos:10+40*p, text:`Em viagem Jaborandi → Colina (${Math.round(p*100)}%)`, dir:"right"} (${Math.round(p*100)}%)`};
+    }
+    if(c && b && mins>=c && mins<=b){
+      const p=(mins-c)/(b-c);
+      found={pos:50+40*p, text:`Em viagem Colina → Barretos (${Math.round(p*100)}%)`, dir:"right"} (${Math.round(p*100)}%)`};
+    }
+  });
+
+  if(found){
+    if(found.dir==="right"){
+      bus.style.transform = "translate(-50%, -50%) scaleX(1)";
+      arrow.textContent = "➡️";
+    } else {
+      bus.style.transform = "translate(-50%, -50%) scaleX(-1)";
+      arrow.textContent = "⬅️";
+    }
+    bus.style.left = found.pos+"%";
+    arrow.style.left = found.pos+"%";
+    status.innerText = found.text;
+  } else {
+    bus.style.left = "5%";
+    arrow.style.left = "5%";
+    status.innerText = "Nenhum ônibus em viagem no momento";
+  }
+  } else {
+    bus.style.left = "5%";
+    status.innerText = "Nenhum ônibus em viagem no momento";
+  }
+}
+
+setInterval(updateBus, 60000);
+// sentido inverso Barretos -> Jaborandi
+  [...week, ...weekend].forEach(r=>{
+    const j=timeToMinutes(r.j);
+    const c=timeToMinutes(r.c);
+    const b=timeToMinutes(r.b);
+    if(b && c && mins>=b && mins<=c){
+      const p=(mins-b)/(c-b);
+      found={pos:90-40*p, text:`Em viagem Barretos → Colina (${Math.round(p*100)}%)`, dir:"left"};
+    }
+    if(c && j && mins>=c && mins<=j){
+      const p=(mins-c)/(j-c);
+      found={pos:50-40*p, text:`Em viagem Colina → Jaborandi (${Math.round(p*100)}%)`, dir:"left"};
+    }
+  });
+}
+
+setInterval(updateBus, 60000);
+updateBus();
+</script></body>
+</html>

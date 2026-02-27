@@ -282,13 +282,24 @@ function updateBusPosition() {
         (lastStop.key === 'j' ? "Jaborandi" :
          lastStop.key === 'c' ? "Colina" : "Barretos");
 
-    } else {
+} else {
+  // Antes do primeiro horário do dia
+  bus.style.display = "block";
 
-      bus.style.display = "block";
-      bus.style.left = positions.j + "%";
-      document.getElementById("status").innerText =
-        "Aguardando primeira saída do dia";
-    }
+  // Pegar a primeira viagem do dia
+  const firstTrip = schedule[0];
+
+  if (firstTrip.dir.includes("Barretos → Jaborandi")) {
+    bus.style.left = positions.b + "%";
+    bus.classList.remove("volta");
+  } else {
+    bus.style.left = positions.j + "%";
+    bus.classList.add("volta");
+  }
+
+  document.getElementById("status").innerText =
+    "Aguardando primeira saída do dia";
+}
   }
 }
 

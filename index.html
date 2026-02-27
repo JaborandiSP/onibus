@@ -68,6 +68,18 @@
   font-weight: bold;
   padding-right: 6px;
 }
+  .seta-movimento {
+  font-size: 18px;
+  font-weight: bold;
+  color: #e67e22;
+  animation: piscar 1.2s infinite;
+}
+
+@keyframes piscar {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.3; }
+  100% { opacity: 1; }
+}
   </style>
 </head>
 <body>
@@ -128,9 +140,10 @@
   <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:30px;">
     <thead style="background:#145a32;color:white;">
 <tr>
-  <th></th>
   <th>Jaborandi</th>
+  <th></th>
   <th>Colina</th>
+  <th></th>
   <th>Barretos</th>
 </tr>
     </thead>
@@ -145,9 +158,10 @@
   <table style="width:100%;border-collapse:collapse;font-size:14px;">
     <thead style="background:#1b4f72;color:white;">
 <tr>
-  <th></th>
   <th>Barretos</th>
+  <th></th>
   <th>Colina</th>
+  <th></th>
   <th>Jaborandi</th>
 </tr>
     </thead>
@@ -381,56 +395,64 @@ function renderScheduleTable() {
     const row = document.createElement("tr");
     row.style.borderBottom = "1px solid #ccc";
 
-    const times = [trip.j, trip.c, trip.b]
-      .map(t => toMinutes(t))
-      .filter(t => t !== null);
+    const times = [
+      {key:'j', time: toMinutes(trip.j), value: trip.j},
+      {key:'c', time: toMinutes(trip.c), value: trip.c},
+      {key:'b', time: toMinutes(trip.b), value: trip.b}
+    ].filter(t => t.time !== null);
 
-    let isActive = false;
+    let activeSegment = null;
 
-    if (times.length >= 2) {
-      const start = Math.min(...times);
-      const end = Math.max(...times);
-
-      if (currentMinutes >= start && currentMinutes <= end) {
-        isActive = true;
-        row.classList.add("linha-ativa");
+    // Descobrir em qual intervalo está
+    for (let i = 0; i < times.length - 1; i++) {
+      if (currentMinutes >= times[i].time &&
+          currentMinutes <= times[i+1].time) {
+        activeSegment = i;
+        break;
       }
     }
 
-    // Definir seta
-    let seta = "";
-    if (isActive) {
-      seta = trip.dir.includes("Jaborandi → Barretos")
-        ? "→"
-        : "←";
-    }
+    const seta = "➜";
 
     if (trip.dir.includes("Barretos → Jaborandi")) {
 
-      row.innerHTML = `
-        <td class="seta-direcao">${seta}</td>
-        <td style="padding:6px;">${trip.b}</td>
-        <td style="padding:6px;">${trip.c}</td>
-        <td style="padding:6px;">${trip.j}</td>
-      `;
+      const cols = [trip.b, trip.c, trip.j];
+      const stopsOrder = ['b','c','j'];
 
+      row.innerHTML = montarLinha(cols, stopsOrder, activeSegment, seta);
       tbodyBJ.appendChild(row);
 
     } else {
 
-      row.innerHTML = `
-        <td class="seta-direcao">${seta}</td>
-        <td style="padding:6px;">${trip.j}</td>
-        <td style="padding:6px;">${trip.c}</td>
-        <td style="padding:6px;">${trip.b}</td>
-      `;
+      const cols = [trip.j, trip.c, trip.b];
+      const stopsOrder = ['j','c','b'];
 
+      row.innerHTML = montarLinha(cols, stopsOrder, activeSegment, seta);
       tbodyJB.appendChild(row);
     }
 
   });
 }
+function montarLinha(cols, stopsOrder, activeSegment, seta) {
 
+  let html = "";
+
+  for (let i = 0; i < cols.length; i++) {
+
+    html += `<td style="padding:6px;">${cols[i]}</td>`;
+
+    // Inserir seta ENTRE colunas se for o trecho ativo
+    if (activeSegment === i) {
+      html += `
+        <td class="seta-movimento">${seta}</td>
+      `;
+    } else if (i < cols.length - 1) {
+      html += `<td></td>`;
+    }
+  }
+
+  return html;
+}
 setInterval(() => {
   updateBusPosition();
   renderScheduleTable();

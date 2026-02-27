@@ -80,7 +80,25 @@
   </div>
 
 </div>
-  <div id="road-wrapper">
+<div style="max-width:1000px;margin:25px auto;padding:10px;">
+
+  <h2 style="margin-bottom:10px;">Tabela de Horários</h2>
+
+  <table id="scheduleTable"
+         style="width:100%;border-collapse:collapse;font-size:14px;">
+    <thead style="background:#1b4f72;color:white;">
+      <tr>
+        <th style="padding:8px;">Sentido</th>
+        <th>Jaborandi</th>
+        <th>Colina</th>
+        <th>Barretos</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
+ <div id="road-wrapper">
     <!-- Estrada com paisagem SVG -->
     <svg viewBox="0 0 1000 300" width="100%" xmlns="http://www.w3.org/2000/svg">
       <!-- Céu/colina/árvores (igual anterior) -->
@@ -103,26 +121,26 @@
   <script>
     // ===== HORÁRIOS =====
     const week = [
-     {dir:'Barretos → Jaborandi', j:'03:50', c:'—',   b:'04:35'},
+     {dir:'Barretos → Jaborandi', j:'04:35', c:'—',   b:'03:50'},
      {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
-     {dir:'Barretos → Jaborandi', j:'07:30', c:'08:00', b:'08:30'},
+     {dir:'Barretos → Jaborandi', j:'08:30', c:'08:00', b:'07:30'},
      {dir:'Jaborandi → Barretos', j:'12:00', c:'12:30', b:'13:00'},
-     {dir:'Barretos → Jaborandi', j:'15:00', c:'15:30', b:'16:00'},
+     {dir:'Barretos → Jaborandi', j:'16:00', c:'15:30', b:'15:00'},
      {dir:'Jaborandi → Barretos', j:'16:00', c:'16:30', b:'17:00'},
-     {dir:'Barretos → Jaborandi', j:'17:00', c:'17:30', b:'18:00'},
+     {dir:'Barretos → Jaborandi', j:'18:00', c:'17:30', b:'17:00'},
      {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
-     {dir:'Barretos → Jaborandi', j:'19:30', c:'20:00', b:'20:30'},
+     {dir:'Barretos → Jaborandi', j:'20:30', c:'20:00', b:'19:30'},
      {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
     ];
     
     const weekend = [
-     {dir:'Barretos → Jaborandi', j:'03:50', c:'—',   b:'04:35'},
+     {dir:'Barretos → Jaborandi', j:'04:35', c:'—',   b:'03:50'},
      {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
-     {dir:'Barretos → Jaborandi', j:'07:30', c:'08:00', b:'08:30'},
+     {dir:'Barretos → Jaborandi', j:'08:30', c:'08:00', b:'07:30'},
      {dir:'Jaborandi → Barretos', j:'15:00', c:'15:30', b:'16:00'},
-     {dir:'Barretos → Jaborandi', j:'16:00', c:'16:30', b:'17:00'},
+     {dir:'Barretos → Jaborandi', j:'17:00', c:'16:30', b:'16:00'},
      {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
-     {dir:'Barretos → Jaborandi', j:'19:30', c:'20:00', b:'20:30'},
+     {dir:'Barretos → Jaborandi', j:'20:30', c:'20:00', b:'19:30'},
      {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
     ];
 
@@ -181,6 +199,7 @@ function updateBusPosition() {
   if (currentMinutes === null) return;
 
   let found = false;
+  let lastStop = null;
 
   for (let trip of schedule) {
 
@@ -199,6 +218,7 @@ function updateBusPosition() {
       const start = stops[i];
       const end = stops[i+1];
 
+      // Ônibus em rota
       if (currentMinutes >= start.time && currentMinutes <= end.time) {
 
         const total = end.time - start.time;
@@ -225,8 +245,38 @@ function updateBusPosition() {
         break;
       }
     }
+
+    // Guardar último ponto já passado
+    for (let stop of stops) {
+      if (currentMinutes >= stop.time) {
+        lastStop = stop;
+      }
+    }
+
     if (found) break;
   }
+
+  const bus = document.getElementById("bus");
+
+  // Se não estiver em rota, deixar parado no último ponto
+  if (!found) {
+
+    if (lastStop) {
+      bus.style.display = "block";
+      bus.style.left = positions[lastStop.key] + "%";
+      document.getElementById("status").innerText =
+        "Última parada: " +
+        (lastStop.key === 'j' ? "Jaborandi" :
+         lastStop.key === 'c' ? "Colina" : "Barretos");
+    } else {
+      // Antes do primeiro horário
+      bus.style.display = "block";
+      bus.style.left = positions.j + "%";
+      document.getElementById("status").innerText =
+        "Aguardando primeira saída do dia";
+    }
+  }
+}
 
   if (!found) {
     document.getElementById("status").innerText = "Ônibus fora de serviço";
@@ -237,6 +287,29 @@ function updateBusPosition() {
 setInterval(updateBusPosition, 1000);
 updateBusPosition();
 
+   function renderScheduleTable() {
+
+  const schedule = getTodaySchedule();
+  const tbody = document.querySelector("#scheduleTable tbody");
+  tbody.innerHTML = "";
+
+  schedule.forEach(trip => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td style="padding:6px;font-weight:bold;">${trip.dir}</td>
+      <td style="padding:6px;">${trip.j}</td>
+      <td style="padding:6px;">${trip.c}</td>
+      <td style="padding:6px;">${trip.b}</td>
+    `;
+
+    row.style.borderBottom = "1px solid #ccc";
+    tbody.appendChild(row);
+  });
+}
+
+renderScheduleTable();
   </script>
 </body>
 </html>

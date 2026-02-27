@@ -278,12 +278,6 @@ function updateBusPosition() {
   }
 }
 
-  if (!found) {
-    document.getElementById("status").innerText = "Ônibus fora de serviço";
-    document.getElementById("bus").style.display = "none";
-  }
-}
-
 setInterval(updateBusPosition, 1000);
 updateBusPosition();
 

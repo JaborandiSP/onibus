@@ -273,15 +273,38 @@ function updateBusPosition() {
 
   if (!found) {
 
-    if (lastStop) {
-      bus.style.display = "block";
-      bus.style.left = positions[lastStop.key] + "%";
+if (lastStop) {
 
-      document.getElementById("status").innerText =
-        "Última parada: " +
-        (lastStop.key === 'j' ? "Jaborandi" :
-         lastStop.key === 'c' ? "Colina" : "Barretos");
+  bus.style.display = "block";
+  bus.style.left = positions[lastStop.key] + "%";
 
+  // Descobrir qual é a próxima viagem
+  let nextTrip = null;
+
+  for (let trip of schedule) {
+    const times = [trip.j, trip.c, trip.b]
+      .map(t => toMinutes(t))
+      .filter(t => t !== null);
+
+    if (times.some(t => t > currentMinutes)) {
+      nextTrip = trip;
+      break;
+    }
+  }
+
+  // Se existir próxima viagem, já virar para ela
+  if (nextTrip) {
+    if (nextTrip.dir.includes("Jaborandi → Barretos")) {
+      bus.classList.add("volta");
+    } else {
+      bus.classList.remove("volta");
+    }
+  }
+
+  document.getElementById("status").innerText =
+    "Última parada: " +
+    (lastStop.key === 'j' ? "Jaborandi" :
+     lastStop.key === 'c' ? "Colina" : "Barretos");
 } else {
   // Antes do primeiro horário do dia
   bus.style.display = "block";

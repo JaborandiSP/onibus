@@ -207,30 +207,29 @@ function updateBusPosition() {
     const c = toMinutes(trip.c);
     const b = toMinutes(trip.b);
 
-  let stops;
+    let stops;
 
-if (trip.dir.includes("Barretos → Jaborandi")) {
-  stops = [
-    {key:'b', time:b},
-    {key:'c', time:c},
-    {key:'j', time:j}
-  ];
-} else {
-  stops = [
-    {key:'j', time:j},
-    {key:'c', time:c},
-    {key:'b', time:b}
-  ];
-}
+    if (trip.dir.includes("Barretos → Jaborandi")) {
+      stops = [
+        {key:'b', time:b},
+        {key:'c', time:c},
+        {key:'j', time:j}
+      ];
+    } else {
+      stops = [
+        {key:'j', time:j},
+        {key:'c', time:c},
+        {key:'b', time:b}
+      ];
+    }
 
-stops = stops.filter(s => s.time !== null);
+    stops = stops.filter(s => s.time !== null);
 
     for (let i = 0; i < stops.length - 1; i++) {
 
       const start = stops[i];
       const end = stops[i+1];
 
-      // Ônibus em rota
       if (currentMinutes >= start.time && currentMinutes <= end.time) {
 
         const total = end.time - start.time;
@@ -245,12 +244,53 @@ stops = stops.filter(s => s.time !== null);
         bus.style.display = "block";
         bus.style.left = busPos + "%";
 
-if (trip.dir.includes("Jaborandi → Barretos")) {
-  bus.classList.add("volta");
-} else {
-  bus.classList.remove("volta");
-}
+        // Espelhamento correto
+        if (trip.dir.includes("Jaborandi → Barretos")) {
+          bus.classList.add("volta");
+        } else {
+          bus.classList.remove("volta");
+        }
+
+        document.getElementById("status").innerText =
+          "Em rota: " + trip.dir;
+
+        found = true;
+        break;
+      }
     }
+
+    // Guardar último ponto já passado
+    for (let stop of stops) {
+      if (currentMinutes >= stop.time) {
+        lastStop = stop;
+      }
+    }
+
+    if (found) break;
+  }
+
+  const bus = document.getElementById("bus");
+
+  if (!found) {
+
+    if (lastStop) {
+      bus.style.display = "block";
+      bus.style.left = positions[lastStop.key] + "%";
+
+      document.getElementById("status").innerText =
+        "Última parada: " +
+        (lastStop.key === 'j' ? "Jaborandi" :
+         lastStop.key === 'c' ? "Colina" : "Barretos");
+
+    } else {
+
+      bus.style.display = "block";
+      bus.style.left = positions.j + "%";
+      document.getElementById("status").innerText =
+        "Aguardando primeira saída do dia";
+    }
+  }
+}
 
     // Guardar último ponto já passado
     for (let stop of stops) {

@@ -80,24 +80,7 @@
   </div>
 
 </div>
-<div style="max-width:1000px;margin:25px auto;padding:10px;">
 
-  <h2 style="margin-bottom:10px;">Tabela de Horários</h2>
-
-  <table id="scheduleTable"
-         style="width:100%;border-collapse:collapse;font-size:14px;">
-    <thead style="background:#1b4f72;color:white;">
-      <tr>
-        <th style="padding:8px;">Sentido</th>
-        <th>Jaborandi</th>
-        <th>Colina</th>
-        <th>Barretos</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-</div>
  <div id="road-wrapper">
     <!-- Estrada com paisagem SVG -->
     <svg viewBox="0 0 1000 300" width="100%" xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +100,24 @@
     <!-- Ônibus PNG -->
     <img id="bus" src="https://ai.jab.br/onibus/onibus.png" alt="Ônibus">
   </div>
+<div style="max-width:1000px;margin:25px auto;padding:10px;">
 
+  <h2 style="margin-bottom:10px;">Tabela de Horários</h2>
+
+  <table id="scheduleTable"
+         style="width:100%;border-collapse:collapse;font-size:14px;">
+    <thead style="background:#1b4f72;color:white;">
+      <tr>
+        <th style="padding:8px;">Sentido</th>
+        <th>Jaborandi</th>
+        <th>Colina</th>
+        <th>Barretos</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+</div>
   <script>
     // ===== HORÁRIOS =====
     const week = [
@@ -207,11 +207,23 @@ function updateBusPosition() {
     const c = toMinutes(trip.c);
     const b = toMinutes(trip.b);
 
-    const stops = [
-      {key:'j', time:j},
-      {key:'c', time:c},
-      {key:'b', time:b}
-    ].filter(s => s.time !== null);
+  let stops;
+
+if (trip.dir.includes("Barretos → Jaborandi")) {
+  stops = [
+    {key:'b', time:b},
+    {key:'c', time:c},
+    {key:'j', time:j}
+  ];
+} else {
+  stops = [
+    {key:'j', time:j},
+    {key:'c', time:c},
+    {key:'b', time:b}
+  ];
+}
+
+stops = stops.filter(s => s.time !== null);
 
     for (let i = 0; i < stops.length - 1; i++) {
 
@@ -233,17 +245,11 @@ function updateBusPosition() {
         bus.style.display = "block";
         bus.style.left = busPos + "%";
 
-        if (startPos > endPos)
-          bus.classList.add("volta");
-        else
-          bus.classList.remove("volta");
-
-        document.getElementById("status")
-          .innerText = "Em rota: " + trip.dir;
-
-        found = true;
-        break;
-      }
+if (trip.dir.includes("Jaborandi → Barretos")) {
+  bus.classList.add("volta");
+} else {
+  bus.classList.remove("volta");
+}
     }
 
     // Guardar último ponto já passado

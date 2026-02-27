@@ -292,38 +292,6 @@ function updateBusPosition() {
   }
 }
 
-    // Guardar último ponto já passado
-    for (let stop of stops) {
-      if (currentMinutes >= stop.time) {
-        lastStop = stop;
-      }
-    }
-
-    if (found) break;
-  }
-
-  const bus = document.getElementById("bus");
-
-  // Se não estiver em rota, deixar parado no último ponto
-  if (!found) {
-
-    if (lastStop) {
-      bus.style.display = "block";
-      bus.style.left = positions[lastStop.key] + "%";
-      document.getElementById("status").innerText =
-        "Última parada: " +
-        (lastStop.key === 'j' ? "Jaborandi" :
-         lastStop.key === 'c' ? "Colina" : "Barretos");
-    } else {
-      // Antes do primeiro horário
-      bus.style.display = "block";
-      bus.style.left = positions.j + "%";
-      document.getElementById("status").innerText =
-        "Aguardando primeira saída do dia";
-    }
-  }
-}
-
 setInterval(updateBusPosition, 1000);
 updateBusPosition();
 

@@ -54,6 +54,11 @@
       font-size: 18px;
       font-weight: bold;
     }
+   .linha-ativa {
+  background-color: #fff3cd;
+  font-weight: bold;
+  box-shadow: inset 4px 0 0 #f39c12;
+}
   </style>
 </head>
 <body>
@@ -104,18 +109,39 @@
 
   <h2 style="margin-bottom:10px;">Tabela de Horários</h2>
 
-  <table id="scheduleTable"
-         style="width:100%;border-collapse:collapse;font-size:14px;">
+<div style="max-width:1000px;margin:25px auto;padding:10px;">
+
+  <h2 style="margin-bottom:10px;color:#1b4f72;">
+    Barretos → Jaborandi
+  </h2>
+
+  <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:30px;">
     <thead style="background:#1b4f72;color:white;">
       <tr>
-        <th style="padding:8px;">Sentido</th>
+        <th style="padding:8px;">Barretos</th>
+        <th>Colina</th>
         <th>Jaborandi</th>
+      </tr>
+    </thead>
+    <tbody id="tbody-bj"></tbody>
+  </table>
+
+  <h2 style="margin-bottom:10px;color:#145a32;">
+    Jaborandi → Barretos
+  </h2>
+
+  <table style="width:100%;border-collapse:collapse;font-size:14px;">
+    <thead style="background:#145a32;color:white;">
+      <tr>
+        <th style="padding:8px;">Jaborandi</th>
         <th>Colina</th>
         <th>Barretos</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="tbody-jb"></tbody>
   </table>
+
+</div>
 
 </div>
   <script>
@@ -326,31 +352,73 @@ if (lastStop) {
   }
 }
 
-setInterval(updateBusPosition, 1000);
-updateBusPosition();
-
-   function renderScheduleTable() {
+function renderScheduleTable() {
 
   const schedule = getTodaySchedule();
-  const tbody = document.querySelector("#scheduleTable tbody");
-  tbody.innerHTML = "";
+  const tbodyBJ = document.getElementById("tbody-bj");
+  const tbodyJB = document.getElementById("tbody-jb");
+
+  tbodyBJ.innerHTML = "";
+  tbodyJB.innerHTML = "";
+
+  const currentMinutes = getCurrentMinutes();
 
   schedule.forEach(trip => {
 
     const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td style="padding:6px;font-weight:bold;">${trip.dir}</td>
-      <td style="padding:6px;">${trip.j}</td>
-      <td style="padding:6px;">${trip.c}</td>
-      <td style="padding:6px;">${trip.b}</td>
-    `;
-
     row.style.borderBottom = "1px solid #ccc";
-    tbody.appendChild(row);
+
+    // Detectar horário início/fim
+    const times = [trip.j, trip.c, trip.b]
+      .map(t => toMinutes(t))
+      .filter(t => t !== null);
+
+    let isActive = false;
+
+    if (times.length >= 2) {
+      const start = Math.min(...times);
+      const end = Math.max(...times);
+
+      if (currentMinutes >= start && currentMinutes <= end) {
+        isActive = true;
+      }
+    }
+
+    if (isActive) {
+      row.classList.add("linha-ativa");
+    }
+
+    // Preencher conforme direção
+    if (trip.dir.includes("Barretos → Jaborandi")) {
+
+      row.innerHTML = `
+        <td style="padding:6px;">${trip.b}</td>
+        <td style="padding:6px;">${trip.c}</td>
+        <td style="padding:6px;">${trip.j}</td>
+      `;
+
+      tbodyBJ.appendChild(row);
+
+    } else {
+
+      row.innerHTML = `
+        <td style="padding:6px;">${trip.j}</td>
+        <td style="padding:6px;">${trip.c}</td>
+        <td style="padding:6px;">${trip.b}</td>
+      `;
+
+      tbodyJB.appendChild(row);
+    }
+
   });
 }
 
+setInterval(() => {
+  updateBusPosition();
+  renderScheduleTable();
+}, 1000);
+
+updateBusPosition();
 renderScheduleTable();
   </script>
 </body>

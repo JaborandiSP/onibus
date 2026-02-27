@@ -63,6 +63,11 @@
   font-weight: bold;
   box-shadow: inset 4px 0 0 #f39c12;
 }
+   .seta-direcao {
+  font-size: 16px;
+  font-weight: bold;
+  padding-right: 6px;
+}
   </style>
 </head>
 <body>
@@ -122,11 +127,12 @@
 
   <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:30px;">
     <thead style="background:#145a32;color:white;">
-      <tr>
-        <th style="padding:8px;">Jaborandi</th>
-        <th>Colina</th>
-        <th>Barretos</th>
-      </tr>
+<tr>
+  <th></th>
+  <th>Jaborandi</th>
+  <th>Colina</th>
+  <th>Barretos</th>
+</tr>
     </thead>
     <tbody id="tbody-jb"></tbody>
   </table>
@@ -138,11 +144,12 @@
 
   <table style="width:100%;border-collapse:collapse;font-size:14px;">
     <thead style="background:#1b4f72;color:white;">
-      <tr>
-        <th style="padding:8px;">Barretos</th>
-        <th>Colina</th>
-        <th>Jaborandi</th>
-      </tr>
+<tr>
+  <th></th>
+  <th>Barretos</th>
+  <th>Colina</th>
+  <th>Jaborandi</th>
+</tr>
     </thead>
     <tbody id="tbody-bj"></tbody>
   </table>
@@ -374,7 +381,6 @@ function renderScheduleTable() {
     const row = document.createElement("tr");
     row.style.borderBottom = "1px solid #ccc";
 
-    // Detectar horário início/fim
     const times = [trip.j, trip.c, trip.b]
       .map(t => toMinutes(t))
       .filter(t => t !== null);
@@ -387,17 +393,22 @@ function renderScheduleTable() {
 
       if (currentMinutes >= start && currentMinutes <= end) {
         isActive = true;
+        row.classList.add("linha-ativa");
       }
     }
 
+    // Definir seta
+    let seta = "";
     if (isActive) {
-      row.classList.add("linha-ativa");
+      seta = trip.dir.includes("Jaborandi → Barretos")
+        ? "→"
+        : "←";
     }
 
-    // Preencher conforme direção
     if (trip.dir.includes("Barretos → Jaborandi")) {
 
       row.innerHTML = `
+        <td class="seta-direcao">${seta}</td>
         <td style="padding:6px;">${trip.b}</td>
         <td style="padding:6px;">${trip.c}</td>
         <td style="padding:6px;">${trip.j}</td>
@@ -408,6 +419,7 @@ function renderScheduleTable() {
     } else {
 
       row.innerHTML = `
+        <td class="seta-direcao">${seta}</td>
         <td style="padding:6px;">${trip.j}</td>
         <td style="padding:6px;">${trip.c}</td>
         <td style="padding:6px;">${trip.b}</td>

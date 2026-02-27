@@ -1,91 +1,164 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Horários Ônibus Jaborandi • Colina • Barretos</title>
-<style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f6fbff;color:#222}
-header{padding:10px;text-align:center;font-weight:bold;background:#0c4da2;color:#fff}
-#scene{width:100%;max-width:900px;margin:auto}
-#info{padding:12px;max-width:900px;margin:auto}
-.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.time-now{font-size:14px;color:#555;margin-bottom:6px}
-.route{font-weight:bold;font-size:16px;margin-bottom:6px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Horário do Ônibus — Jaborandi</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Arial Rounded MT Bold", "Nunito", sans-serif;
+      background: #fdfdfd;
+      color: #222;
+      text-align: center;
+    }
+    header {
+      padding: 12px 0;
+      background: #1b4f72;
+      color: white;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    #road-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1080px;
+      margin: auto;
+      overflow: hidden;
+    }
+    #bus {
+      position: absolute;
+      top: 210px;
+      width: 16vw;
+      max-width: 120px;
+      transition: left 0.8s ease;
+    }
+    #bus.volta {
+      transform: scaleX(-1);
+    }
+    #status {
+      margin: 12px 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-<header>🚌 Horários do Ônibus Jaborandi • Colina • Barretos</header><!-- CENA SVG COM FUNDO + ÔNIBUS --><svg id="scene" viewBox="0 0 800 300">
-  <!-- FUNDO ESTRADA ESTILO INFANTIL -->
-  <rect width="800" height="300" fill="#e8f7ff"/>
-  <path d="M0 220 Q200 200 400 220 T800 210" fill="#cdebd3" stroke="#a6d9b4" stroke-width="3"/>
-  <rect y="220" width="800" height="80" fill="#c0c0c0"/>
-  <path d="M0 260 H800" stroke="#ffffff" stroke-dasharray="15 10" stroke-width="4"/>  <!-- ÁRVORES -->  <circle cx="120" cy="200" r="20" fill="#7edfa1"/>
-  <rect x="115" y="210" width="10" height="20" fill="#8b5a2b"/>
-  <circle cx="300" cy="190" r="25" fill="#7edfa1"/>
-  <rect x="295" y="200" width="10" height="25" fill="#8b5a2b"/>
-  <circle cx="650" cy="195" r="18" fill="#7edfa1"/>
-  <rect x="645" y="205" width="10" height="18" fill="#8b5a2b"/>  <!-- ÔNIBUS -->  <g id="bus" transform="translate(200,150)">
-    <rect x="0" y="0" rx="20" ry="20" width="300" height="80" fill="#0c4da2"/>
-    <rect x="10" y="10" width="70" height="40" fill="#bcdcff"/>
-    <rect x="90" y="10" width="70" height="40" fill="#bcdcff"/>
-    <rect x="170" y="10" width="70" height="40" fill="#bcdcff"/>
-    <text x="150" y="65" fill="#fff" font-size="16" text-anchor="middle">Rápido D'Oeste</text>
-    <circle cx="50" cy="80" r="15" fill="#333"/>
-    <circle cx="250" cy="80" r="15" fill="#333"/>
-  </g>
-</svg><div id="info">
-  <div class="card">
-    <div class="time-now" id="now"></div>
-    <div class="route" id="route"></div>
-    <div id="next"></div>
-  </div>  <div class="card">
-    <b>Horários (Exemplo)</b><br>
-    Jaborandi → Colina: 06:00, 09:00, 12:00, 15:00, 18:00<br>
-    Colina → Barretos: 06:30, 09:30, 12:30, 15:30, 18:30<br>
-    Barretos → Jaborandi: 07:00, 10:00, 13:00, 16:00, 19:00
+
+  <header>Horário do Ônibus — Jaborandi ↔ Barretos</header>
+
+  <div id="status">Carregando...</div>
+
+  <div id="road-wrapper">
+    <!-- Estrada com paisagem SVG -->
+    <svg viewBox="0 0 1000 300" width="100%" xmlns="http://www.w3.org/2000/svg">
+      <!-- Céu/colina/árvores (igual anterior) -->
+      <rect width="1000" height="300" fill="#dff3ff"/>
+      <path d="M0 170 Q150 100 300 170 T600 170 T900 170 T1200 170 V300 H0 Z" fill="#b7e4c7"/>
+      <path d="M0 190 Q200 130 400 190 T800 190 T1200 190 V300 H0 Z" fill="#95d5b2"/>
+      <rect x="0" y="200" width="1000" height="20" fill="#74c69d"/>
+      <rect x="0" y="220" width="1000" height="60" fill="#2f2f3f"/>
+      <line x1="0" y1="250" x2="1000" y2="250" stroke="#fff" stroke-width="6" stroke-dasharray="30,25"/>
+      <!-- Pontos -->
+      <text x="80" y="160" font-size="20" font-weight="bold" fill="#1b4332">Jaborandi</text>
+      <text x="470" y="160" font-size="20" font-weight="bold" fill="#1b4332">Colina</text>
+      <text x="860" y="160" font-size="20" font-weight="bold" fill="#1b4332">Barretos</text>
+    </svg>
+
+    <!-- Ônibus PNG -->
+    <img id="bus" src="https://ai.jab.br/onibus/onibus.png" alt="Ônibus">
   </div>
-</div><script>
-const horarios = {
-  jaborandi_colina: ["06:00","09:00","12:00","15:00","18:00"],
-  colina_barretos: ["06:30","09:30","12:30","15:30","18:30"],
-  barretos_jaborandi: ["07:00","10:00","13:00","16:00","19:00"]
-};
 
-function getNext(hs){
-  const now = new Date();
-  const current = now.getHours()*60+now.getMinutes();
-  for(let h of hs){
-    let [hh,mm]=h.split(":").map(Number);
-    let m = hh*60+mm;
-    if(m>current) return h;
-  }
-  return hs[0];
-}
+  <script>
+    // ===== HORÁRIOS =====
+    const week = [
+     {dir:'Barretos → Jaborandi', j:'03:50', c:'—',   b:'04:35'},
+     {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
+     {dir:'Barretos → Jaborandi', j:'07:30', c:'08:00', b:'08:30'},
+     {dir:'Jaborandi → Barretos', j:'12:00', c:'12:30', b:'13:00'},
+     {dir:'Barretos → Jaborandi', j:'15:00', c:'15:30', b:'16:00'},
+     {dir:'Jaborandi → Barretos', j:'16:00', c:'16:30', b:'17:00'},
+     {dir:'Barretos → Jaborandi', j:'17:00', c:'17:30', b:'18:00'},
+     {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
+     {dir:'Barretos → Jaborandi', j:'19:30', c:'20:00', b:'20:30'},
+     {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
+    ];
+    
+    const weekend = [
+     {dir:'Barretos → Jaborandi', j:'03:50', c:'—',   b:'04:35'},
+     {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
+     {dir:'Barretos → Jaborandi', j:'07:30', c:'08:00', b:'08:30'},
+     {dir:'Jaborandi → Barretos', j:'15:00', c:'15:30', b:'16:00'},
+     {dir:'Barretos → Jaborandi', j:'16:00', c:'16:30', b:'17:00'},
+     {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
+     {dir:'Barretos → Jaborandi', j:'19:30', c:'20:00', b:'20:30'},
+     {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
+    ];
 
-function update(){
-  const now = new Date();
-  document.getElementById("now").innerText = "Agora: "+now.toLocaleTimeString();
+    const positions = { j:5, c:50, b:95 };
 
-  const nextJ = getNext(horarios.jaborandi_colina);
-  const nextC = getNext(horarios.colina_barretos);
-  const nextB = getNext(horarios.barretos_jaborandi);
+    function toMinutes(t) {
+      if (!t || t === '—') return null;
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
 
-  document.getElementById("route").innerText = "Próximas partidas:";
-  document.getElementById("next").innerHTML = `
-    Jaborandi → Colina: <b>${nextJ}</b><br>
-    Colina → Barretos: <b>${nextC}</b><br>
-    Barretos → Jaborandi: <b>${nextB}</b>`;
+    function getTodaySchedule() {
+      return ([0,6].includes(new Date().getDay()) ? weekend : week);
+    }
 
-  // vira o ônibus conforme rota (exemplo simples)
-  const bus = document.getElementById("bus");
-  if(now.getMinutes()%2==0){
-    bus.setAttribute("transform","translate(200,150) scale(-1,1)");
-  }else{
-    bus.setAttribute("transform","translate(200,150) scale(1,1)");
-  }
-}
+    function updateBusPosition() {
+      const sch = getTodaySchedule();
+      const now = new Date();
+      const m = now.getHours()*60 + now.getMinutes();
+      let found = false;
 
-update();
-setInterval(update,60000);
-</script></body>
+      for (let trip of sch) {
+        const j = toMinutes(trip.j);
+        const c = toMinutes(trip.c);
+        const b = toMinutes(trip.b);
+
+        const stops = [
+          {key:'j', time:j},
+          {key:'c', time:c},
+          {key:'b', time:b}
+        ].filter(s => s.time !== null);
+
+        for (let i=0; i<stops.length-1; i++) {
+          const s0 = stops[i], s1 = stops[i+1];
+          if (m >= s0.time && m <= s1.time) {
+            const total = s1.time - s0.time;
+            const passed = m - s0.time;
+            const prog = passed/total;
+            const startPos = positions[s0.key];
+            const endPos = positions[s1.key];
+            const busPos = startPos + (endPos - startPos)*prog;
+
+            const bus = document.getElementById("bus");
+            bus.style.left = busPos+"%";
+            if (startPos > endPos) bus.classList.add("volta");
+            else bus.classList.remove("volta");
+
+            document.getElementById("status")
+              .innerText = `Em rota: ${trip.dir} — agora ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      if (!found) {
+        document.getElementById("status").innerText = "Ônibus fora de serviço neste horário";
+        document.getElementById("bus").style.display = "none";
+      }
+    }
+
+    setInterval(updateBusPosition, 30000);
+    updateBusPosition();
+
+  </script>
+</body>
 </html>

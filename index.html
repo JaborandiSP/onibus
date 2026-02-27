@@ -61,7 +61,25 @@
   <header>Horário do Ônibus — Jaborandi ↔ Barretos</header>
 
   <div id="status">Carregando...</div>
+<div style="margin:15px 0;">
 
+  <div id="clock" style="font-size:22px;font-weight:bold;">
+    --:--
+  </div>
+
+  <div style="margin-top:10px;">
+    <label>
+      Testar horário:
+      <input type="time" id="manualTime" style="font-size:16px;padding:4px;">
+    </label>
+
+    <button onclick="toggleManualTime()" 
+            style="padding:6px 10px;margin-left:5px;">
+      Ativar Teste
+    </button>
+  </div>
+
+</div>
   <div id="road-wrapper">
     <!-- Estrada com paisagem SVG -->
     <svg viewBox="0 0 1000 300" width="100%" xmlns="http://www.w3.org/2000/svg">
@@ -120,55 +138,104 @@
       return ([0,6].includes(new Date().getDay()) ? weekend : week);
     }
 
-    function updateBusPosition() {
-      const sch = getTodaySchedule();
-      const now = new Date();
-      const m = now.getHours()*60 + now.getMinutes();
-      let found = false;
+let useManualTime = false;
 
-      for (let trip of sch) {
-        const j = toMinutes(trip.j);
-        const c = toMinutes(trip.c);
-        const b = toMinutes(trip.b);
+function getCurrentMinutes() {
 
-        const stops = [
-          {key:'j', time:j},
-          {key:'c', time:c},
-          {key:'b', time:b}
-        ].filter(s => s.time !== null);
+  if (useManualTime) {
+    const val = document.getElementById("manualTime").value;
+    if (!val) return null;
+    const [h,m] = val.split(":").map(Number);
+    return h*60 + m;
+  }
 
-        for (let i=0; i<stops.length-1; i++) {
-          const s0 = stops[i], s1 = stops[i+1];
-          if (m >= s0.time && m <= s1.time) {
-            const total = s1.time - s0.time;
-            const passed = m - s0.time;
-            const prog = passed/total;
-            const startPos = positions[s0.key];
-            const endPos = positions[s1.key];
-            const busPos = startPos + (endPos - startPos)*prog;
+  const now = new Date();
+  return now.getHours()*60 + now.getMinutes();
+}
 
-            const bus = document.getElementById("bus");
-            bus.style.left = busPos+"%";
-            if (startPos > endPos) bus.classList.add("volta");
-            else bus.classList.remove("volta");
+function updateClockDisplay() {
+  let text;
 
-            document.getElementById("status")
-              .innerText = `Em rota: ${trip.dir} — agora ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+  if (useManualTime) {
+    text = document.getElementById("manualTime").value || "--:--";
+  } else {
+    const now = new Date();
+    text = now.getHours().toString().padStart(2,'0') + ":" +
+           now.getMinutes().toString().padStart(2,'0');
+  }
 
-            found = true;
-            break;
-          }
-        }
-        if (found) break;
-      }
-      if (!found) {
-        document.getElementById("status").innerText = "Ônibus fora de serviço neste horário";
-        document.getElementById("bus").style.display = "none";
+  document.getElementById("clock").innerText = text;
+}
+
+function toggleManualTime() {
+  useManualTime = !useManualTime;
+  updateBusPosition();
+}
+
+function updateBusPosition() {
+
+  updateClockDisplay();
+
+  const schedule = getTodaySchedule();
+  const currentMinutes = getCurrentMinutes();
+  if (currentMinutes === null) return;
+
+  let found = false;
+
+  for (let trip of schedule) {
+
+    const j = toMinutes(trip.j);
+    const c = toMinutes(trip.c);
+    const b = toMinutes(trip.b);
+
+    const stops = [
+      {key:'j', time:j},
+      {key:'c', time:c},
+      {key:'b', time:b}
+    ].filter(s => s.time !== null);
+
+    for (let i = 0; i < stops.length - 1; i++) {
+
+      const start = stops[i];
+      const end = stops[i+1];
+
+      if (currentMinutes >= start.time && currentMinutes <= end.time) {
+
+        const total = end.time - start.time;
+        const passed = currentMinutes - start.time;
+        const progress = passed / total;
+
+        const startPos = positions[start.key];
+        const endPos = positions[end.key];
+        const busPos = startPos + (endPos - startPos) * progress;
+
+        const bus = document.getElementById("bus");
+        bus.style.display = "block";
+        bus.style.left = busPos + "%";
+
+        if (startPos > endPos)
+          bus.classList.add("volta");
+        else
+          bus.classList.remove("volta");
+
+        document.getElementById("status")
+          .innerText = "Em rota: " + trip.dir;
+
+        found = true;
+        break;
       }
     }
+    if (found) break;
+  }
 
-    setInterval(updateBusPosition, 30000);
-    updateBusPosition();
+  if (!found) {
+    document.getElementById("status").innerText = "Ônibus fora de serviço";
+    document.getElementById("bus").style.display = "none";
+  }
+}
+
+setInterval(updateBusPosition, 1000);
+updateBusPosition();
 
   </script>
 </body>

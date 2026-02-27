@@ -44,10 +44,13 @@
   top: 73%;
   width: 16vw;
   max-width: 120px;
-  transition: left 0.8s ease, transform 0.3s ease;
+  transition: left 0.8s ease, transform 0.3s ease, top 0.3s ease;
   transform: translate(-50%, -60%);
 }
+
+/* Sentido Jaborandi → Barretos */
 #bus.volta {
+  top: 78%; /* desce um pouco */
   transform: translate(-50%, -60%) scaleX(-1);
 }
     #status {

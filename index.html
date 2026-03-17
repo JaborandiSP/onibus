@@ -1,477 +1,200 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
- <script async src="https://www.googletagmanager.com/gtag/js?id=G-09B2K29XXV"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09B2K29XXV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+
   gtag('config', 'G-09B2K29XXV');
 </script>
-
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6493068451182223"
-     crossorigin="anonymous"></script>
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Horário do Ônibus — Jaborandi</title>
-
-  <style>
+     crossorigin="anonymous">
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horários Linha 6429</title>
+<style>
     body {
-      margin: 0;
-      font-family: "Arial Rounded MT Bold", "Nunito", sans-serif;
-      background: #fdfdfd;
-      color: #222;
-      text-align: center;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #fff;
     }
-    header {
-      padding: 12px 0;
-     text-align:center;
-      background: #7dbb9c;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
-   header img {
-    display: block;
-    margin:0 auto -30px auto;
-    max-width: 180px; 
-}
-    #road-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 1080px;
-      margin: auto;
-      overflow: hidden;
-    }
-#bus {
-  position: absolute;
-  top: 54%;
-  width: 16vw;
-  max-width: 120px;
-  transition: left 0.8s ease, transform 0.3s ease, top 0.3s ease;
-  transform: translate(-50%, -60%);
-}
 
-/* Sentido Jaborandi → Barretos */
-#bus.volta {
-  top: 70%; /* desce um pouco */
-  transform: translate(-50%, -60%) scaleX(-1);
-}
-    #status {
-      margin: 12px 0;
-      font-size: 18px;
-      font-weight: bold;
+    /* Fundo da imagem igual à linha LINHA: 6429 */
+    .topo-imagem {
+        background: #0E2841;
+        text-align: center;
+        padding: 10px;
     }
-   .linha-ativa {
-  background-color: #fff3cd;
-  font-weight: bold;
-  box-shadow: inset 4px 0 0 #f39c12;
-}
-   .seta-direcao {
-  font-size: 16px;
-  font-weight: bold;
-  padding-right: 6px;
-}
-  .seta-movimento {
-  font-size: 18px;
-  font-weight: bold;
-  color: #e67e22;
-  animation: piscar 1.2s infinite;
-}
+    .topo-imagem img {
+        max-width: 100%;
+        height: auto;
+    }
 
-@keyframes piscar {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.3; }
-  100% { opacity: 1; }
-}
-  </style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin: 0 auto;
+    }
+
+    th, td {
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid #000;
+        padding: 8px 5px;
+        font-size: 14px;
+    }
+
+    /* Cabeçalhos de blocos sticky */
+    .linha-header, .subheader {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .linha-header {
+        background: #0E2841;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .subheader {
+        background: #2276AA;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    /* Horários */
+    .horario {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Rodapé */
+    .rodape {
+        text-align: center;
+        font-size: 12px;
+        color: #333;
+        margin: 20px 10px;
+    }
+
+    /* Botão voltar */
+    .botao-voltar {
+        display: inline-block;
+        background-color: #2276AA;
+        color: #fff;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 20px auto;
+        text-align: center;
+    }
+    .botao-voltar:hover {
+        background-color: #0E2841;
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+        th, td {
+            font-size: 12px;
+            padding: 6px 3px;
+        }
+    }
+</style>
 </head>
 <body>
 
-  <header>
-   <img src="https://ai.jab.br/images/logo.webp"><br>
-GUIA JABORANDI<br>
-Horário do Ônibus<br>
-Jaborandi ↔ Barretos<br>
-   * Com base na vigência a partir de 14/10/2025<br>
-<a href="https://wa.me/5517997023603" style="color:white;">Contato WhatsApp: 99702-3603</a>
-</header>
-  <div id="status">Carregando...</div>
-<div style="margin:15px 0;">
-
-  <div id="clock" style="font-size:22px;font-weight:bold;">
-    --:--
-  </div>
-
-  <div style="margin-top:10px;">
-    <label>
-      Testar horário:
-      <input type="time" id="manualTime" style="font-size:16px;padding:4px;">
-    </label>
-
-    <button onclick="toggleManualTime()" 
-            style="padding:6px 10px;margin-left:5px;">
-      Ativar Teste
-    </button>
-  </div>
-
+<!-- Imagem topo -->
+<div class="topo-imagem">
+    <img src="images/logo.png" alt="Topo Horários">
 </div>
 
- <div id="road-wrapper">
-    <!-- Estrada com paisagem SVG -->
-    <svg viewBox="0 130 1000 170" width="100%" xmlns="http://www.w3.org/2000/svg">
-      <!-- Céu/colina/árvores (igual anterior) -->
-      <rect width="1000" height="300" fill="#dff3ff"/>
-      <path d="M0 170 Q150 100 300 170 T600 170 T900 170 T1200 170 V300 H0 Z" fill="#b7e4c7"/>
-      <path d="M0 190 Q200 130 400 190 T800 190 T1200 190 V300 H0 Z" fill="#95d5b2"/>
-      <rect x="0" y="200" width="1000" height="20" fill="#74c69d"/>
-      <rect x="0" y="220" width="1000" height="60" fill="#2f2f3f"/>
-      <line x1="0" y1="250" x2="1000" y2="250" stroke="#fff" stroke-width="6" stroke-dasharray="30,25"/>
-      <!-- Pontos -->
-      <text x="80" y="160" font-size="20" font-weight="bold" fill="#1b4332">Jaborandi</text>
-      <text x="470" y="160" font-size="20" font-weight="bold" fill="#1b4332">Colina</text>
-      <text x="860" y="160" font-size="20" font-weight="bold" fill="#1b4332">Barretos</text>
-    </svg>
+<!-- Tabela de horários -->
+<table>
+    <!-- Linha de identificação -->
+    <tr class="linha-header">
+        <td colspan="3">LINHA: 6429 - Jaborandi x Barretos</td>
+    </tr>
+    <tr class="subheader">
+        <td colspan="2">VIGÊNCIA</td>
+        <td>14/10/2025</td>
+    </tr>
 
-    <!-- Ônibus PNG -->
-    <img id="bus" src="https://ai.jab.br/onibus/onibus.png" alt="Ônibus">
-  </div>
-<div style="max-width:1000px;margin:25px auto;padding:10px;">
+    <!-- Horários semanais -->
+    <tr class="subheader">
+        <td colspan="3">SEGUNDA A SEXTA</td>
+    </tr>
+    <tr class="subheader">
+        <td>Parte de Jaborandi</td>
+        <td>Passa em Colina</td>
+        <td>Chega em Barretos</td>
+    </tr>
+    <tr class="horario"><td>04:45</td><td>05:15</td><td>05:45</td></tr>
+    <tr class="horario"><td>12:00</td><td>12:30</td><td>13:00</td></tr>
+    <tr class="horario"><td>16:00</td><td>16:30</td><td>17:00</td></tr>
+    <tr class="horario"><td>18:00</td><td>18:00</td><td>19:00</td></tr>
+    <tr class="horario"><td>20:30</td><td>-</td><td>21:15</td></tr>
 
-  <h2 style="margin-bottom:10px;">Tabela de Horários</h2>
+    <tr class="subheader">
+        <td colspan="3">BARRETOS PARA JABORANDI</td>
+    </tr>
+    <tr class="subheader">
+        <td>Parte de Barretos</td>
+        <td>Passa em Colina</td>
+        <td>Chega em Jaborandi</td>
+    </tr>
+    <tr class="horario"><td>03:50</td><td>-</td><td>04:35</td></tr>
+    <tr class="horario"><td>07:30</td><td>08:00</td><td>08:30</td></tr>
+    <tr class="horario"><td>15:00</td><td>15:30</td><td>16:00</td></tr>
+    <tr class="horario"><td>17:00</td><td>17:30</td><td>18:00</td></tr>
+    <tr class="horario"><td>19:30</td><td>20:00</td><td>20:30</td></tr>
 
-<div style="max-width:1000px;margin:25px auto;padding:10px;">
+    <!-- Horários finais -->
+    <tr class="subheader">
+        <td colspan="3">SÁBADO E DOMINGO</td>
+    </tr>
+    <tr class="subheader">
+        <td colspan="3">JABORANDI PARA BARRETOS</td>
+    </tr>
+    <tr class="subheader">
+        <td>Parte de Jaborandi</td>
+        <td>Passa em Colina</td>
+        <td>Chega em Barretos</td>
+    </tr>
+    <tr class="horario"><td>04:45</td><td>05:15</td><td>05:45</td></tr>
+    <tr class="horario"><td>15:00</td><td>15:30</td><td>16:00</td></tr>
+    <tr class="horario"><td>18:00</td><td>18:30</td><td>19:00</td></tr>
+    <tr class="horario"><td>20:30</td><td>-</td><td>21:15</td></tr>
 
-  <!-- PRIMEIRO: Jaborandi → Barretos -->
-  <h2 style="margin-bottom:10px;color:#145a32;">
-    Jaborandi → Barretos
-  </h2>
-
-  <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:30px;">
-    <thead style="background:#145a32;color:white;">
-<tr>
-  <th>Jaborandi</th>
-  <th></th>
-  <th>Colina</th>
-  <th></th>
-  <th>Barretos</th>
-</tr>
-    </thead>
-    <tbody id="tbody-jb"></tbody>
-  </table>
-
-  <!-- DEPOIS: Barretos → Jaborandi -->
-  <h2 style="margin-bottom:10px;color:#1b4f72;">
-    Barretos → Jaborandi
-  </h2>
-
-  <table style="width:100%;border-collapse:collapse;font-size:14px;">
-    <thead style="background:#1b4f72;color:white;">
-<tr>
-  <th>Barretos</th>
-  <th></th>
-  <th>Colina</th>
-  <th></th>
-  <th>Jaborandi</th>
-</tr>
-    </thead>
-    <tbody id="tbody-bj"></tbody>
-  </table>
-
+    <tr class="subheader">
+        <td colspan="3">BARRETOS PARA JABORANDI</td>
+    </tr>
+    <tr class="subheader">
+        <td>Parte de Barretos</td>
+        <td>Passa em Colina</td>
+        <td>Chega em Jaborandi</td>
+    </tr>
+    <tr class="horario"><td>03:50</td><td>-</td><td>04:35</td></tr>
+    <tr class="horario"><td>07:30</td><td>08:00</td><td>08:30</td></tr>
+    <tr class="horario"><td>16:00</td><td>16:30</td><td>17:00</td></tr>
+    <tr class="horario"><td>19:30</td><td>20:00</td><td>20:30</td></tr>
+</table>
+<div class="rodape">
+    * Horários organizados com base na <a href="foto.html">fotografia de referência</a>, com vigência a partir de 14/10/2025.
 </div>
 
+<!-- Botão voltar -->
+<div style="text-align:center;">
+    <a class="botao-voltar" href="https://ai.jab.br/index.html">Voltar para a página inicial</a>
 </div>
-  <script>
-    // ===== HORÁRIOS =====
-    const week = [
-     {dir:'Barretos → Jaborandi', j:'04:35', c:'—',   b:'03:50'},
-     {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
-     {dir:'Barretos → Jaborandi', j:'08:30', c:'08:00', b:'07:30'},
-     {dir:'Jaborandi → Barretos', j:'12:00', c:'12:30', b:'13:00'},
-     {dir:'Barretos → Jaborandi', j:'16:00', c:'15:30', b:'15:00'},
-     {dir:'Jaborandi → Barretos', j:'16:00', c:'16:30', b:'17:00'},
-     {dir:'Barretos → Jaborandi', j:'18:00', c:'17:30', b:'17:00'},
-     {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
-     {dir:'Barretos → Jaborandi', j:'20:30', c:'20:00', b:'19:30'},
-     {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
-    ];
-    
-    const weekend = [
-     {dir:'Barretos → Jaborandi', j:'04:35', c:'—',   b:'03:50'},
-     {dir:'Jaborandi → Barretos', j:'04:45', c:'05:15', b:'05:45'},
-     {dir:'Barretos → Jaborandi', j:'08:30', c:'08:00', b:'07:30'},
-     {dir:'Jaborandi → Barretos', j:'15:00', c:'15:30', b:'16:00'},
-     {dir:'Barretos → Jaborandi', j:'17:00', c:'16:30', b:'16:00'},
-     {dir:'Jaborandi → Barretos', j:'18:00', c:'18:30', b:'19:00'},
-     {dir:'Barretos → Jaborandi', j:'20:30', c:'20:00', b:'19:30'},
-     {dir:'Jaborandi → Barretos', j:'20:30', c:'—',   b:'21:15'}
-    ];
 
-    const positions = { j:10, c:50, b:90 };
-
-    function toMinutes(t) {
-      if (!t || t === '—') return null;
-      const [h, m] = t.split(':').map(Number);
-      return h * 60 + m;
-    }
-
-    function getTodaySchedule() {
-      return ([0,6].includes(new Date().getDay()) ? weekend : week);
-    }
-
-let useManualTime = false;
-
-function getCurrentMinutes() {
-
-  if (useManualTime) {
-    const val = document.getElementById("manualTime").value;
-    if (!val) return null;
-    const [h,m] = val.split(":").map(Number);
-    return h*60 + m;
-  }
-
-  const now = new Date();
-  return now.getHours()*60 + now.getMinutes();
-}
-
-function updateClockDisplay() {
-  let text;
-
-  if (useManualTime) {
-    text = document.getElementById("manualTime").value || "--:--";
-  } else {
-    const now = new Date();
-    text = now.getHours().toString().padStart(2,'0') + ":" +
-           now.getMinutes().toString().padStart(2,'0');
-  }
-
-  document.getElementById("clock").innerText = text;
-}
-
-function toggleManualTime() {
-  useManualTime = !useManualTime;
-  updateBusPosition();
-}
-
-function updateBusPosition() {
-
-  updateClockDisplay();
-
-  const schedule = getTodaySchedule();
-  const currentMinutes = getCurrentMinutes();
-  if (currentMinutes === null) return;
-
-  let found = false;
-  let lastStop = null;
-
-  for (let trip of schedule) {
-
-    const j = toMinutes(trip.j);
-    const c = toMinutes(trip.c);
-    const b = toMinutes(trip.b);
-
-    let stops;
-
-    if (trip.dir.includes("Barretos → Jaborandi")) {
-      stops = [
-        {key:'b', time:b},
-        {key:'c', time:c},
-        {key:'j', time:j}
-      ];
-    } else {
-      stops = [
-        {key:'j', time:j},
-        {key:'c', time:c},
-        {key:'b', time:b}
-      ];
-    }
-
-    stops = stops.filter(s => s.time !== null);
-
-    for (let i = 0; i < stops.length - 1; i++) {
-
-      const start = stops[i];
-      const end = stops[i+1];
-
-      if (currentMinutes >= start.time && currentMinutes <= end.time) {
-
-        const total = end.time - start.time;
-        const passed = currentMinutes - start.time;
-        const progress = passed / total;
-
-        const startPos = positions[start.key];
-        const endPos = positions[end.key];
-        const busPos = startPos + (endPos - startPos) * progress;
-
-        const bus = document.getElementById("bus");
-        bus.style.display = "block";
-        bus.style.left = busPos + "%";
-
-        // Espelhamento correto
-        if (trip.dir.includes("Jaborandi → Barretos")) {
-          bus.classList.add("volta");
-        } else {
-          bus.classList.remove("volta");
-        }
-
-        document.getElementById("status").innerText =
-          "Em rota: " + trip.dir;
-
-        found = true;
-        break;
-      }
-    }
-
-    // Guardar último ponto já passado
-    for (let stop of stops) {
-      if (currentMinutes >= stop.time) {
-        lastStop = stop;
-      }
-    }
-
-    if (found) break;
-  }
-
-  const bus = document.getElementById("bus");
-
-  if (!found) {
-
-if (lastStop) {
-
-  bus.style.display = "block";
-  bus.style.left = positions[lastStop.key] + "%";
-
-  // Descobrir qual é a próxima viagem
-  let nextTrip = null;
-
-  for (let trip of schedule) {
-    const times = [trip.j, trip.c, trip.b]
-      .map(t => toMinutes(t))
-      .filter(t => t !== null);
-
-    if (times.some(t => t > currentMinutes)) {
-      nextTrip = trip;
-      break;
-    }
-  }
-
-  // Se existir próxima viagem, já virar para ela
-  if (nextTrip) {
-    if (nextTrip.dir.includes("Jaborandi → Barretos")) {
-      bus.classList.add("volta");
-    } else {
-      bus.classList.remove("volta");
-    }
-  }
-
-  document.getElementById("status").innerText =
-    "Última parada: " +
-    (lastStop.key === 'j' ? "Jaborandi" :
-     lastStop.key === 'c' ? "Colina" : "Barretos");
-} else {
-  // Antes do primeiro horário do dia
-  bus.style.display = "block";
-
-  // Pegar a primeira viagem do dia
-  const firstTrip = schedule[0];
-
-  if (firstTrip.dir.includes("Barretos → Jaborandi")) {
-    bus.style.left = positions.b + "%";
-    bus.classList.remove("volta");
-  } else {
-    bus.style.left = positions.j + "%";
-    bus.classList.add("volta");
-  }
-
-  document.getElementById("status").innerText =
-    "Aguardando primeira saída do dia";
-}
-  }
-}
-
-function renderScheduleTable() {
-
-  const schedule = getTodaySchedule();
-  const tbodyBJ = document.getElementById("tbody-bj");
-  const tbodyJB = document.getElementById("tbody-jb");
-
-  tbodyBJ.innerHTML = "";
-  tbodyJB.innerHTML = "";
-
-  const currentMinutes = getCurrentMinutes();
-
-  schedule.forEach(trip => {
-
-    const row = document.createElement("tr");
-    row.style.borderBottom = "1px solid #ccc";
-
-    const times = [
-      {key:'j', time: toMinutes(trip.j), value: trip.j},
-      {key:'c', time: toMinutes(trip.c), value: trip.c},
-      {key:'b', time: toMinutes(trip.b), value: trip.b}
-    ].filter(t => t.time !== null);
-
-    let activeSegment = null;
-
-    // Descobrir em qual intervalo está
-    for (let i = 0; i < times.length - 1; i++) {
-      if (currentMinutes >= times[i].time &&
-          currentMinutes <= times[i+1].time) {
-        activeSegment = i;
-        break;
-      }
-    }
-
-    const seta = "➜";
-
-    if (trip.dir.includes("Barretos → Jaborandi")) {
-
-      const cols = [trip.b, trip.c, trip.j];
-      const stopsOrder = ['b','c','j'];
-
-      row.innerHTML = montarLinha(cols, stopsOrder, activeSegment, seta);
-      tbodyBJ.appendChild(row);
-
-    } else {
-
-      const cols = [trip.j, trip.c, trip.b];
-      const stopsOrder = ['j','c','b'];
-
-      row.innerHTML = montarLinha(cols, stopsOrder, activeSegment, seta);
-      tbodyJB.appendChild(row);
-    }
-
-  });
-}
-function montarLinha(cols, stopsOrder, activeSegment, seta) {
-
-  let html = "";
-
-  for (let i = 0; i < cols.length; i++) {
-
-    html += `<td style="padding:6px;">${cols[i]}</td>`;
-
-    // Inserir seta ENTRE colunas se for o trecho ativo
-    if (activeSegment === i) {
-      html += `
-        <td class="seta-movimento">${seta}</td>
-      `;
-    } else if (i < cols.length - 1) {
-      html += `<td></td>`;
-    }
-  }
-
-  return html;
-}
-setInterval(() => {
-  updateBusPosition();
-  renderScheduleTable();
-}, 1000);
-
-updateBusPosition();
-renderScheduleTable();
-  </script>
 </body>
 </html>
